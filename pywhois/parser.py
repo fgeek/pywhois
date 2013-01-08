@@ -103,6 +103,8 @@ class WhoisEntry(object):
         	return WhoisMe(domain, text)
         elif '.uk' in domain:
         	return WhoisUk(domain, text)
+        elif '.fr' in domain:
+            return WhoisFr(domain, text)
         elif '.fi' in domain:
         	return WhoisFi(domain, text)
         else:
@@ -119,6 +121,7 @@ class WhoisCom(WhoisEntry):
         else:
             WhoisEntry.__init__(self, domain, text) 
 
+
 class WhoisNet(WhoisEntry):
     """Whois parser for .net domains
     """
@@ -128,6 +131,7 @@ class WhoisNet(WhoisEntry):
         else:
             WhoisEntry.__init__(self, domain, text) 
 
+
 class WhoisOrg(WhoisEntry):
     """Whois parser for .org domains
     """
@@ -136,6 +140,7 @@ class WhoisOrg(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text) 
+
 
 class WhoisRu(WhoisEntry):
     """Whois parser for .ru domains
@@ -155,6 +160,7 @@ class WhoisRu(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
+
 
 class WhoisName(WhoisEntry):
     """Whois parser for .name domains
@@ -180,7 +186,8 @@ class WhoisName(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex) 
-            
+    
+        
 class WhoisUs(WhoisEntry):
     """Whois parser for .us domains
     """
@@ -347,6 +354,28 @@ class WhoisUk(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
+
+
+class WhoisFr(WhoisEntry):
+    """Whois parser for .fr domains
+    """
+    regex = {
+        'domain_name': 'domain:\s*(.+)',
+        'registrar': 'registrar:\s*(.+)',
+        'creation_date': 'created:\s*(.+)',
+        'expiration_date': 'anniversary:\s*(.+)',
+        'name_servers': 'nserver:\s*(.+)',  # list of name servers
+        'status': 'status:\s*(.+)',  # list of statuses
+        'emails': '[\w.-]+@[\w.-]+\.[\w]{2,4}',  # list of email addresses
+        'updated_date': 'last-update:\s*(.+)',
+    }
+
+    def __init__(self, domain, text):
+        if text.strip() == 'No entries found':
+            raise PywhoisError(text)
+        else:
+            WhoisEntry.__init__(self, domain, text, self.regex)
+
 
 class WhoisFi(WhoisEntry):
     """Whois parser for .fi domains
