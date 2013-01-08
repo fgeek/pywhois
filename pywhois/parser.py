@@ -340,6 +340,7 @@ class WhoisUk(WhoisEntry):
         'creation_date':                  'Registered on:\s*(.+)',
         'expiration_date':                'Renewal date:\s*(.+)',
         'updated_date':                   'Last updated:\s*(.+)',
+        'name_servers':                   'Name servers:\s*(.+)',
 	}
     def __init__(self, domain, text):
         if 'Not found:' in text:
