@@ -53,7 +53,6 @@ class WhoisEntry(object):
     }
 
     def __init__(self, domain, text, regex=None):
-        print text
         self.domain = domain
         self.text = text
         if regex is not None:
