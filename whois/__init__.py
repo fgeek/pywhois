@@ -10,7 +10,6 @@ def whois(url):
     # clean domain to expose netloc
     domain = extract_domain(url)
     try:
-        raise OSError()
         # try native whois command first
         r = subprocess.Popen(['whois', domain], stdout=subprocess.PIPE)
         text = r.stdout.read()
