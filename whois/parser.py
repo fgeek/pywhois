@@ -29,7 +29,7 @@ def cast_date(s):
     for known_format in known_formats:
         try:
             return datetime.strptime(s.strip(), known_format)
-        except ValueError, e:
+        except ValueError as e:
             pass # Wrong format, keep trying
     return s
 
@@ -65,7 +65,7 @@ class WhoisEntry(object):
         """
         whois_regex = self._regex.get(attr)
         if whois_regex:
-            values = re.findall(whois_regex, self.text)
+            values = re.findall(whois_regex, self.text, re.IGNORECASE)
             # try casting to date format
             values = [cast_date(value.strip()) for value in values]
             if len(values) == 1:

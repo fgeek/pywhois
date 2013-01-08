@@ -18,7 +18,6 @@ def whois(url):
         # try experimental client
         nic_client = NICClient()
         text = nic_client.whois_lookup(None, domain, 0)
-    print text
     return WhoisEntry.load(domain, text)
 
 
@@ -51,6 +50,6 @@ if __name__ == '__main__':
     try:
         url = sys.argv[1]
     except IndexError:
-        print 'Usage: %s url' % sys.argv[0]
+        print('Usage: %s url' % sys.argv[0])
     else:
-        print whois(url)
+        print(whois(url))

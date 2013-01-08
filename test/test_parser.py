@@ -4,12 +4,12 @@ import os
 import sys
 sys.path.append('../')
 
-import time
+import datetime
 
 import simplejson
 from glob import glob
 
-from pywhois.parser import WhoisEntry, cast_date
+from whois.parser import WhoisEntry, cast_date
 
 class TestParser(unittest.TestCase):
     def test_com_expiration(self):
@@ -22,13 +22,13 @@ class TestParser(unittest.TestCase):
             >>> Last update of whois database: Sun, 31 Aug 2008 00:18:23 UTC <<<
         """
         w = WhoisEntry.load('urlowl.com', data)
-        expires = w.get('expiration_date')
-        self.assertEquals(expires, ['14-apr-2009'])
+        expires = w.expiration_date.strftime('%Y-%m-%d')
+        self.assertEquals(expires, '2009-04-14')
 
     def test_cast_date(self):
         dates = ['14-apr-2008', '2008-04-14']
         for d in dates:
-            r = time.strftime('%Y-%m-%d', cast_date(d))
+            r = cast_date(d).strftime('%Y-%m-%d')
             self.assertEquals(r, '2008-04-14')
 
     def test_com_allsamples(self):
@@ -74,3 +74,7 @@ class TestParser(unittest.TestCase):
             
         if fail:
             self.fail("%d sample whois attributes were not parsed properly!" % fail)
+
+
+if __name__ == '__main__':
+    unittest.main()
