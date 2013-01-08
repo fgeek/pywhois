@@ -5,7 +5,7 @@
 # the MIT license: http://www.opensource.org/licenses/mit-license.php
 
 import re
-import time
+from datetime import datetime
    
 
 class PywhoisError(Exception):
@@ -18,6 +18,7 @@ def cast_date(date_str):
     known_formats = [
         '%d-%b-%Y', 				# 02-jan-2000
         '%Y-%m-%d', 				# 2000-01-02
+        '%d.%m.%Y', 				# 2000-01-02
         '%d-%b-%Y %H:%M:%S %Z',		# 24-Jul-2009 13:20:03 UTC
         '%a %b %d %H:%M:%S %Z %Y',  # Tue Jun 21 23:59:59 GMT 2011
         '%Y-%m-%dT%H:%M:%SZ',       # 2007-01-26T19:10:31Z
@@ -25,7 +26,7 @@ def cast_date(date_str):
 
     for format in known_formats:
         try:
-            return time.strptime(date_str.strip(), format)
+            return datetime.strptime(date_str.strip(), format)
         except ValueError, e:
             pass # Wrong format, keep trying
     return None
@@ -102,6 +103,8 @@ class WhoisEntry(object):
         	return WhoisMe(domain, text)
         elif '.uk' in domain:
         	return WhoisUk(domain, text)
+        elif '.fi' in domain:
+        	return WhoisFi(domain, text)
         else:
             return WhoisEntry(domain, text)
 
@@ -337,6 +340,27 @@ class WhoisUk(WhoisEntry):
         'creation_date':                  'Registered on:\s*(.+)',
         'expiration_date':                'Renewal date:\s*(.+)',
         'updated_date':                   'Last updated:\s*(.+)',
+	}
+    def __init__(self, domain, text):
+        if 'Not found:' in text:
+            raise PywhoisError(text)
+        else:
+            WhoisEntry.__init__(self, domain, text, self.regex)
+
+class WhoisFi(WhoisEntry):
+    """Whois parser for .fi domains
+    """
+    regex = {
+        'domain_name':                    'domain:\s*([\S]+)',
+        'registrant_name':                'descr:\s*([\S\ ]+)',
+        'registrant_address':             'address:\s*([\S\ ]+)',
+        'registrant_phone':               'phone:\s*([\S\ ]+)',
+        'status':                         'status:\s*([\S]+)',  # list of statuses
+        'creation_date':                  'created:\s*([\S]+)',
+        'updated_date':                   'modified:\s*([\S]+)',
+        'expiration_date':                'expires:\s*([\S]+)',
+        'name_servers':                   'nserver:\s*([\S]+) \[(\S+)\]',  # list of name servers
+        'dnssec':                   'dnssec:\s*([\S]+)',  # list of name servers
 	}
     def __init__(self, domain, text):
         if 'Not found:' in text:
