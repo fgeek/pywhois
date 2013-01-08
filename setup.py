@@ -3,24 +3,26 @@ import sys, os
 
 version = '0.1'
 
-setup(name='pywhois',
-      version=version,
-      description="Whois querying and parsing of domain registration information.",
-      long_description="""\
-""",
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
-      keywords='whois',
-      author='Andrey Petrov',
-      author_email='andrey.petrov@shazow.net',
-      url='http://code.google.com/p/pywhois/',
-      license='MIT',
-      packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
-      include_package_data=True,
-      zip_safe=False,
-      install_requires=[
-          # -*- Extra requirements: -*-
-      ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
-      )
+setup(
+    name='whois',
+    version=version,
+    description="Whois querying and parsing of domain registration information.",
+    long_description='',
+    classifiers=[
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Internet :: WWW/HTTP'
+    ],
+    keywords='whois',
+    author='Richard Penman',
+    author_email='richard@webscraping.com',
+    url='http://code.google.com/p/pywhois/',
+    license='MIT',
+    packages=['pywhois'],
+    package_dir={'pywhois':'pywhois'},
+    include_package_data=True,
+    zip_safe=False,
+)
