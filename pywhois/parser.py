@@ -116,6 +116,8 @@ class WhoisEntry(object):
         	return WhoisFi(domain, text)
         elif domain.endswith('.jp'):
             return WhoisJp(domain, text)
+        elif domain.endswith('.pl'):
+            return WhoisPl(domain, text)
         else:
             return WhoisEntry(domain, text)
 
@@ -271,7 +273,27 @@ class WhoisUs(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
-        
+       
+
+class WhoisPl(WhoisEntry):
+   """Whois parser for .uk domains
+   """
+   regex = {
+       'domain_name':                    'DOMAIN NAME:\s*(.+)\n',
+       'registrar':                      'REGISTRAR:\n\s*(.+)',
+       'registrar_url':                  'URL:\s*(.+)',        # not available
+       'status':                         'Registration status:\n\s*(.+)',  # not available
+       'registrant_name':                'Registrant:\n\s*(.+)',   # not available
+       'creation_date':                  'created:\s*(.+)\n',
+       'expiration_date':                'renewal date:\s*(.+)',
+       'updated_date':                   'last modified:\s*(.+)\n',
+   }
+   def __init__(self, domain, text):
+       if 'Not found:' in text:
+           raise PywhoisError(text)
+       else:
+           WhoisEntry.__init__(self, domain, text, self.regex)
+ 
     
 class WhoisMe(WhoisEntry):
     """Whois parser for .me domains
