@@ -12,24 +12,26 @@ class PywhoisError(Exception):
     pass
 
 
-def cast_date(date_str):
-    """Convert any date string found in WHOIS to a time object.
+def cast_date(s):
+    """Convert any date string found in WHOIS to a datetime object.
     """
     known_formats = [
         '%d-%b-%Y', 				# 02-jan-2000
         '%Y-%m-%d', 				# 2000-01-02
         '%d.%m.%Y', 				# 2000-01-02
+        '%Y.%m.%d',                 # 2000.01.02
+        '%Y/%m/%d',                 # 2000/01/02
         '%d-%b-%Y %H:%M:%S %Z',		# 24-Jul-2009 13:20:03 UTC
         '%a %b %d %H:%M:%S %Z %Y',  # Tue Jun 21 23:59:59 GMT 2011
         '%Y-%m-%dT%H:%M:%SZ',       # 2007-01-26T19:10:31Z
     ]
 
-    for format in known_formats:
+    for known_format in known_formats:
         try:
-            return datetime.strptime(date_str.strip(), format)
+            return datetime.strptime(s.strip(), known_format)
         except ValueError, e:
             pass # Wrong format, keep trying
-    return None
+    return s
 
 
 class WhoisEntry(object):
@@ -51,6 +53,7 @@ class WhoisEntry(object):
     }
 
     def __init__(self, domain, text, regex=None):
+        print text
         self.domain = domain
         self.text = text
         if regex is not None:
@@ -63,7 +66,12 @@ class WhoisEntry(object):
         """
         whois_regex = self._regex.get(attr)
         if whois_regex:
-            setattr(self, attr, re.findall(whois_regex, self.text))
+            values = re.findall(whois_regex, self.text)
+            # try casting to date format
+            values = [cast_date(value.strip()) for value in values]
+            if len(values) == 1:
+                values = values[0]
+            setattr(self, attr, values)
             return getattr(self, attr)
         else:
             raise KeyError('Unknown attribute: %s' % attr)
@@ -107,6 +115,8 @@ class WhoisEntry(object):
             return WhoisFr(domain, text)
         elif '.fi' in domain:
         	return WhoisFi(domain, text)
+        elif '.jp' in domain:
+            return WhoisJp(domain, text)
         else:
             return WhoisEntry(domain, text)
 
@@ -262,7 +272,8 @@ class WhoisUs(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
-            
+        
+    
 class WhoisMe(WhoisEntry):
     """Whois parser for .me domains
     """
@@ -335,6 +346,7 @@ class WhoisMe(WhoisEntry):
         else:
             WhoisEntry.__init__(self, domain, text, self.regex) 
 
+
 class WhoisUk(WhoisEntry):
     """Whois parser for .uk domains
     """
@@ -345,7 +357,7 @@ class WhoisUk(WhoisEntry):
         'status':                         'Registration status:\n\s*(.+)',  # list of statuses
         'registrant_name':                'Registrant:\n\s*(.+)',
         'creation_date':                  'Registered on:\s*(.+)',
-        'expiration_date':                'Renewal date:\s*(.+)',
+        'expiration_date':                'Expiry date:\s*(.+)',
         'updated_date':                   'Last updated:\s*(.+)',
         'name_servers':                   'Name servers:\s*(.+)',
 	}
@@ -394,6 +406,25 @@ class WhoisFi(WhoisEntry):
 	}
     def __init__(self, domain, text):
         if 'Not found:' in text:
+            raise PywhoisError(text)
+        else:
+            WhoisEntry.__init__(self, domain, text, self.regex)
+
+
+class WhoisJp(WhoisEntry):
+    """Whois parser for .jp domains
+    """
+    regex = {
+        'domain_name': 'a\. \[Domain Name\]\s*(.+)',
+        'registrant_org': 'g\. \[Organization\](.+)',
+        'creation_date': r'\[Registered Date\]\s*(.+)',
+        'name_servers': 'p\. \[Name Server\]\s*(.+)',  # list of name servers
+        'updated_date':  '\[Last Update\]\s?(.+)',
+        'status': '\[State\]\s*(.+)',  # list of statuses
+    }
+
+    def __init__(self, domain, text):
+        if text.strip() == 'No entries found':
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
