@@ -18,7 +18,7 @@ def cast_date(s):
     known_formats = [
         '%d-%b-%Y', 				# 02-jan-2000
         '%Y-%m-%d', 				# 2000-01-02
-        '%d.%m.%Y', 				# 2000-01-02
+        '%d.%m.%Y', 				# 2.1.2000
         '%Y.%m.%d',                 # 2000.01.02
         '%Y/%m/%d',                 # 2000/01/02
         '%d-%b-%Y %H:%M:%S %Z',		# 24-Jul-2009 13:20:03 UTC
@@ -422,11 +422,12 @@ class WhoisFi(WhoisEntry):
         'creation_date':                  'created:\s*([\S]+)',
         'updated_date':                   'modified:\s*([\S]+)',
         'expiration_date':                'expires:\s*([\S]+)',
-        'name_servers':                   'nserver:\s*([\S]+) \[(\S+)\]',  # list of name servers
-        'dnssec':                   'dnssec:\s*([\S]+)',  # list of name servers
+        'name_servers':                   'nserver:\s*([\S]+) \[\S+\]',  # list of name servers
+        'name_server_statuses':           'nserver:\s*([\S]+) \[(\S+)\]',  # list of name servers and statuses
+        'dnssec':                   'dnssec:\s*([\S]+)',
 	}
     def __init__(self, domain, text):
-        if 'Not found:' in text:
+        if 'Domain not ' in text:
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
