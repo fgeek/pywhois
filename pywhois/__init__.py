@@ -17,6 +17,7 @@ def whois(url):
         # try experimental client
         nic_client = NICClient()
         text = nic_client.whois_lookup(None, domain, 0)
+    print text
     return WhoisEntry.load(domain, text)
 
 

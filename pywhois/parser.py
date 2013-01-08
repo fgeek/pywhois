@@ -94,27 +94,27 @@ class WhoisEntry(object):
         if text.strip() == 'No whois server is known for this kind of object.':
             raise PywhoisError(text)
 
-        if '.com' in domain:
+        if domain.endswith('.com'):
             return WhoisCom(domain, text)
-        elif '.net' in domain:
+        elif domain.endswith('.net'):
             return WhoisNet(domain, text)
-        elif '.org' in domain:
+        elif domain.endswith('.org'):
             return WhoisOrg(domain, text)
-        elif '.ru' in domain:
-            return WhoisRu(domain, text)
-        elif '.name' in domain:
+        elif domain.endswith('.name'):
         	return WhoisName(domain, text)
-        elif '.us' in domain:
-        	return WhoisUs(domain, text)
-        elif '.me' in domain:
+        elif domain.endswith('.me'):
         	return WhoisMe(domain, text)
-        elif '.uk' in domain:
+        elif domain.endswith('.ru'):
+            return WhoisRu(domain, text)
+        elif domain.endswith('.us'):
+        	return WhoisUs(domain, text)
+        elif domain.endswith('.uk'):
         	return WhoisUk(domain, text)
-        elif '.fr' in domain:
+        elif domain.endswith('.fr'):
             return WhoisFr(domain, text)
-        elif '.fi' in domain:
+        elif domain.endswith('.fi'):
         	return WhoisFi(domain, text)
-        elif '.jp' in domain:
+        elif domain.endswith('.jp'):
             return WhoisJp(domain, text)
         else:
             return WhoisEntry(domain, text)
