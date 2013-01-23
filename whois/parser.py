@@ -121,6 +121,8 @@ class WhoisEntry(object):
             return WhoisJp(domain, text)
         elif domain.endswith('.pl'):
             return WhoisPl(domain, text)
+        elif domain.endswith('.br'):
+            return WhoisBr(domain,text)
         else:
             return WhoisEntry(domain, text)
 
@@ -453,3 +455,36 @@ class WhoisJp(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
+
+class WhoisBr(WhoisEntry):
+   """Whois parser for .br domains
+   """
+   regex = {
+       'domain':                        'domain:\s*(.+)\n',
+       'owner':                         'owner:\s*([\S ]+)',
+       'ownerid':                       'ownerid:\s*(.+)', 
+       'country':                       'country:\s*(.+)',
+       'owner_c':                       'owner-c:\s*(.+)',
+       'admin_c':                       'admin-c:\s*(.+)',
+       'tech_c':                        'tech-c:\s*(.+)',
+       'billing_c':                     'billing-c:\s*(.+)',
+       'nserver':                       'nserver:\s*(.+)',
+       'nsstat':                        'nsstat:\s*(.+)',
+       'nslastaa':                      'nslastaa:\s*(.+)',
+       'saci':                          'saci:\s*(.+)',
+       'created':                       'created:\s*(.+)',
+       'expires':                       'expires:\s*(.+)',
+       'changed':                       'changed:\s*(.+)',
+       'status':                        'status:\s*(.+)',
+       'nic_hdl_br':                    'nic-hdl-br:\s*(.+)',
+       'person':                        'person:\s*([\S ]+)',
+       'email':                         'e-mail:\s*(.+)',
+   }
+
+   def __init__(self, domain, text):
+
+       if 'Not found:' in text:
+           raise PywhoisError(text)
+       else:
+           WhoisEntry.__init__(self, domain, text, self.regex)
+
