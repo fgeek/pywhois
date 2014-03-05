@@ -21,6 +21,7 @@ def cast_date(s):
         '%d.%m.%Y', 				# 2.1.2000
         '%Y.%m.%d',                 # 2000.01.02
         '%Y/%m/%d',                 # 2000/01/02
+        '%d/%m/%Y',                 # 02/01/2013
         '%Y. %m. %d.',              # 2000. 01. 02.
         '%Y.%m.%d %H:%M:%S',        # 2014.03.08 10:28:24
         '%d-%b-%Y %H:%M:%S %Z',		# 24-Jul-2009 13:20:03 UTC
@@ -133,11 +134,13 @@ class WhoisEntry(object):
         elif domain.endswith('.pl'):
             return WhoisPl(domain, text)
         elif domain.endswith('.br'):
-            return WhoisBr(domain,text)
+            return WhoisBr(domain, text)
         elif domain.endswith('.eu'):
-            return WhoisEu(domain,text)
+            return WhoisEu(domain, text)
         elif domain.endswith('.kr'):
-            return WhoisKr(domain,text)
+            return WhoisKr(domain, text)
+        elif domain.endswith('.pt'):
+            return WhoisPt(domain, text)
         else:
             return WhoisEntry(domain, text)
 
@@ -569,3 +572,20 @@ class WhoisKr(WhoisEntry):
             WhoisEntry.__init__(self, domain, text, self.regex)
 
 
+class WhoisPt(WhoisEntry):
+    """Whois parser for .pt domains
+    """
+    regex = {
+        'domain_name': 'domain name:\s*(.+)',
+        'creation_date': 'creation date \(dd\/mm\/yyyy\):\s*(.+)',
+        'expiration_date': 'expiration date \(dd\/mm\/yyyy\):\s*(.+)',
+        'name_servers': '\tNS\t(.+).', # list of name servers
+        'status': 'status:\s*(.+)', # list of statuses
+        'emails': '[\w.-]+@[\w.-]+\.[\w]{2,4}', # list of email addresses
+    }
+
+    def __init__(self, domain, text):
+        if text.strip() == 'No entries found':
+            raise PywhoisError(text)
+        else:
+            WhoisEntry.__init__(self, domain, text, self.regex)
