@@ -76,7 +76,7 @@ class WhoisEntry(object):
                 if isinstance(value, basestring):
                     # try casting to date format
                     value = cast_date(value.strip())
-                if value not in values:
+                if value and value not in values:
                     # avoid duplicates
                     values.append(value)
             if len(values) == 1:
@@ -134,6 +134,8 @@ class WhoisEntry(object):
             return WhoisPl(domain, text)
         elif domain.endswith('.br'):
             return WhoisBr(domain,text)
+        elif domain.endswith('.eu'):
+            return WhoisEu(domain,text)
         elif domain.endswith('.kr'):
             return WhoisKr(domain,text)
         else:
@@ -486,6 +488,27 @@ class WhoisAU(WhoisEntry):
            raise PywhoisError(text)
        else:
            WhoisEntry.__init__(self, domain, text, self.regex)
+
+
+class WhoisEu(WhoisEntry):
+    """Whois parser for .eu domains
+    """
+    regex = {
+        'domain_name': r'Domain:\s*([^\n\r]+)',
+        'tech_name': r'Technical:\s*Name:\s*([^\n\r]+)',
+        'tech_org': r'Technical:\s*Name:\s*[^\n\r]+\s*Organisation:\s*([^\n\r]+)',
+        'tech_phone': r'Technical:\s*Name:\s*[^\n\r]+\s*Organisation:\s*[^\n\r]+\s*Language:\s*[^\n\r]+\s*Phone:\s*([^\n\r]+)',
+        'tech_fax': r'Technical:\s*Name:\s*[^\n\r]+\s*Organisation:\s*[^\n\r]+\s*Language:\s*[^\n\r]+\s*Phone:\s*[^\n\r]+\s*Fax:\s*([^\n\r]+)',
+        'tech_email': r'Technical:\s*Name:\s*[^\n\r]+\s*Organisation:\s*[^\n\r]+\s*Language:\s*[^\n\r]+\s*Phone:\s*[^\n\r]+\s*Fax:\s*[^\n\r]+\s*Email:\s*([^\n\r]+)',
+        'registrar': r'Registrar:\s*Name:\s*([^\n\r]+)',
+        'name_servers': r'Name servers:\s*([^\n\r]+)\s*([^\n\r]*)\s*([^\n\r]*)\s*([^\n\r]*)\s*([^\n\r]*)\s*([^\n\r]*)\s*([^\n\r]*)\s*([^\n\r]*)\s*([^\n\r]*)\s*Keys',  # list of name servers
+    }
+
+    def __init__(self, domain, text):
+        if text.strip() == 'Status: AVAILABLE':
+            raise PywhoisError(text)
+        else:
+            WhoisEntry.__init__(self, domain, text, self.regex)
 
 
 class WhoisBr(WhoisEntry):
