@@ -27,10 +27,14 @@ def extract_domain(url):
     'google.com.au'
     >>> extract_domain('http://blog.webscraping.com')
     'webscraping.com'
-    >>> extract_domain('69.59.196.211')
+    >>> extract_domain('198.252.206.140')
     'stackoverflow.com'
+    >>> extract_domain('102.112.2O7.net')
+    '2o7.net'
+    >>> extract_domain('1-0-1-1-1-0-1-1-1-1-1-1-1-.0-0-0-0-0-0-0-0-0-0-0-0-0-10-0-0-0-0-0-0-0-0-0-0-0-0-0.info')
+    '0-0-0-0-0-0-0-0-0-0-0-0-0-10-0-0-0-0-0-0-0-0-0-0-0-0-0.info'
     """
-    if re.match(r'\d+.\d+.\d+.\d+', url):
+    if re.match(r'\d+\.\d+\.\d+\.\d+', url):
         # this is an IP address
         return socket.gethostbyaddr(url)[0]
 

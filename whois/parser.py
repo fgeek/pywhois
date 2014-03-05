@@ -299,7 +299,7 @@ class WhoisUs(WhoisEntry):
        
 
 class WhoisPl(WhoisEntry):
-   """Whois parser for .uk domains
+   """Whois parser for .pl domains
    """
    regex = {
        'domain_name':                    'DOMAIN NAME:\s*(.+)\n',
