@@ -53,7 +53,7 @@ class WhoisEntry(object):
         'referral_url':     'Referral URL:\s?(.+)', # http url of whois_server
         'updated_date':     'Updated Date:\s?(.+)',
         'creation_date':    'Creation Date:\s?(.+)',
-        'expiration_date':  'Expiration Date:\s?(.+)',
+        'expiration_date':  'Expir\w+ Date:\s?(.+)',
         'name_servers':     'Name Server:\s?(.+)', # list of name servers
         'status':           'Status:\s?(.+)', # list of statuses
         'emails':           '[\w.-]+@[\w.-]+\.[\w]{2,4}', # list of email addresses
@@ -82,6 +82,8 @@ class WhoisEntry(object):
                     values.append(value)
             if len(values) == 1:
                 values = values[0]
+            elif not values:
+                values = None
 
             setattr(self, attr, values)
             return getattr(self, attr)

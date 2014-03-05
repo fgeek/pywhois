@@ -27,6 +27,8 @@ def extract_domain(url):
     'google.com.au'
     >>> extract_domain('http://blog.webscraping.com')
     'webscraping.com'
+    >>> extract_domain('www.bbc.co.uk')
+    'bbc.co.uk'
     >>> extract_domain('198.252.206.140')
     'stackoverflow.com'
     >>> extract_domain('102.112.2O7.net')
