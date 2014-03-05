@@ -21,6 +21,7 @@ def cast_date(s):
         '%d.%m.%Y', 				# 2.1.2000
         '%Y.%m.%d',                 # 2000.01.02
         '%Y/%m/%d',                 # 2000/01/02
+        '%Y. %m. %d.',              # 2000. 01. 02.
         '%Y.%m.%d %H:%M:%S',        # 2014.03.08 10:28:24
         '%d-%b-%Y %H:%M:%S %Z',		# 24-Jul-2009 13:20:03 UTC
         '%a %b %d %H:%M:%S %Z %Y',  # Tue Jun 21 23:59:59 GMT 2011
@@ -133,6 +134,8 @@ class WhoisEntry(object):
             return WhoisPl(domain, text)
         elif domain.endswith('.br'):
             return WhoisBr(domain,text)
+        elif domain.endswith('.kr'):
+            return WhoisKr(domain,text)
         else:
             return WhoisEntry(domain, text)
 
@@ -516,4 +519,30 @@ class WhoisBr(WhoisEntry):
            raise PywhoisError(text)
        else:
            WhoisEntry.__init__(self, domain, text, self.regex)
+
+
+class WhoisKr(WhoisEntry):
+    """Whois parser for .kr domains
+    """
+    regex = {
+        'domain_name': 'Domain Name\s*:\s*(.+)',
+        'registrant_org': 'Registrant\s*:\s*(.+)',
+        'registrant_address': 'Registrant Address\s*:\s*(.+)',
+        'registrant_zip': 'Registrant Zip Code\s*:\s*(.+)',
+        'admin_name': 'Administrative Contact\(AC\)\s*:\s*(.+)',
+        'admin_email': 'AC E-Mail\s*:\s*(.+)',
+        'admin_phone': 'AC Phone Number\s*:\s*(.+)',
+        'creation_date': 'Registered Date\s*:\s*(.+)',
+        'updated_date':  'Last updated Date\s*:\s*(.+)',
+        'expiration_date':  'Expiration Date\s*:\s*(.+)',
+        'registrar':  'Authorized Agency\s*:\s*(.+)',
+        'name_servers': 'Host Name\s*:\s*(.+)',  # list of name servers
+    }
+
+    def __init__(self, domain, text):
+        if text.strip() == 'No entries found':
+            raise PywhoisError(text)
+        else:
+            WhoisEntry.__init__(self, domain, text, self.regex)
+
 
