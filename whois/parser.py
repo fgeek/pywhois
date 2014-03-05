@@ -25,12 +25,14 @@ def cast_date(s):
         '%a %b %d %H:%M:%S %Z %Y',  # Tue Jun 21 23:59:59 GMT 2011
         '%Y-%m-%dT%H:%M:%SZ',       # 2007-01-26T19:10:31Z
         '%Y-%m-%d %H:%M:%SZ',       # 2000-08-22 18:55:20Z
+        '%Y-%m-%d %H:%M:%S',        # 2000-08-22 18:55:20
         '%d %b %Y %H:%M:%S',        # 08 Apr 2013 05:44:00
     ]
 
     for known_format in known_formats:
         try:
-            return datetime.strptime(s.strip(), known_format)
+            s = datetime.strptime(s.strip(), known_format)
+            break
         except ValueError as e:
             pass # Wrong format, keep trying
     return s
@@ -112,6 +114,8 @@ class WhoisEntry(object):
         	return WhoisName(domain, text)
         elif domain.endswith('.me'):
         	return WhoisMe(domain, text)
+        elif domain.endswith('.au'):
+            return WhoisAU(domain, text)
         elif domain.endswith('.ru'):
             return WhoisRu(domain, text)
         elif domain.endswith('.us'):
@@ -460,6 +464,25 @@ class WhoisJp(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
+
+
+class WhoisAU(WhoisEntry):
+   """Whois parser for .au domains
+   """
+   regex = {
+       'domain_name':                    'Domain Name:\s*(.+)\n',
+       'last_modified':			      'Last Modified:\s*(.+)\n',
+       'registrar':                      'Registrar Name:\s*(.+)\n',
+       'status':                         'Status:\s*(.+)',  
+       'registrant_name':                'Registrant:\s*(.+)',
+       'name_servers':                   'Name Server:\s*(.+)',
+   }
+   def __init__(self, domain, text):
+       if text.strip() == 'No Data Found':
+           raise PywhoisError(text)
+       else:
+           WhoisEntry.__init__(self, domain, text, self.regex)
+
 
 class WhoisBr(WhoisEntry):
    """Whois parser for .br domains
