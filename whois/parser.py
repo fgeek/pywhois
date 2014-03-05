@@ -27,6 +27,7 @@ def cast_date(s):
         '%d-%b-%Y %H:%M:%S %Z',		# 24-Jul-2009 13:20:03 UTC
         '%a %b %d %H:%M:%S %Z %Y',  # Tue Jun 21 23:59:59 GMT 2011
         '%Y-%m-%dT%H:%M:%SZ',       # 2007-01-26T19:10:31Z
+        '%Y-%m-%dT%H:%M:%S%z',      # 2013-12-06T08:17:22-0800
         '%Y-%m-%d %H:%M:%SZ',       # 2000-08-22 18:55:20Z
         '%Y-%m-%d %H:%M:%S',        # 2000-08-22 18:55:20
         '%d %b %Y %H:%M:%S',        # 08 Apr 2013 05:44:00
@@ -94,6 +95,15 @@ class WhoisEntry(object):
         """Print all whois properties of domain
         """
         return '\n'.join('%s: %s' % (attr, str(getattr(self, attr))) for attr in self.attrs())
+
+
+    def __getstate__(self):
+        """To support pickling
+        """
+        return self.__dict__
+
+    def __setstate__(self, state):
+        self.__dict__ = state
 
 
     def attrs(self):
