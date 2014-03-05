@@ -24,6 +24,8 @@ def cast_date(s):
         '%d-%b-%Y %H:%M:%S %Z',		# 24-Jul-2009 13:20:03 UTC
         '%a %b %d %H:%M:%S %Z %Y',  # Tue Jun 21 23:59:59 GMT 2011
         '%Y-%m-%dT%H:%M:%SZ',       # 2007-01-26T19:10:31Z
+        '%Y-%m-%d %H:%M:%SZ',       # 2000-08-22 18:55:20Z
+        '%d %b %Y %H:%M:%S',        # 08 Apr 2013 05:44:00
     ]
 
     for known_format in known_formats:
@@ -70,9 +72,12 @@ class WhoisEntry(object):
                 if isinstance(value, basestring):
                     # try casting to date format
                     value = cast_date(value.strip())
-                values.append(value)
+                if value not in values:
+                    # avoid duplicates
+                    values.append(value)
             if len(values) == 1:
                 values = values[0]
+
             setattr(self, attr, values)
             return getattr(self, attr)
         else:
