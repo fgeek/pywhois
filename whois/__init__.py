@@ -8,7 +8,11 @@ from whois import NICClient
 
 def whois(url):
     # clean domain to expose netloc
-    domain = extract_domain(url)
+    ip_match = re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", url)
+    if ip_match:
+        domain = url
+    else:
+        domain = extract_domain(url)
     try:
         # try native whois command first
         r = subprocess.Popen(['whois', domain], stdout=subprocess.PIPE)
