@@ -31,6 +31,8 @@ def cast_date(s):
         '%Y-%m-%d %H:%M:%SZ',       # 2000-08-22 18:55:20Z
         '%Y-%m-%d %H:%M:%S',        # 2000-08-22 18:55:20
         '%d %b %Y %H:%M:%S',        # 08 Apr 2013 05:44:00
+        '%d/%m/%Y %H:%M:%S %Z',     # 23/04/2015 12:00:07 EEST
+        '%d/%m/%Y %H:%M:%S.%f %Z',  # 23/04/2015 12:00:07.619546 EEST
     ]
 
     for known_format in known_formats:
@@ -58,6 +60,7 @@ class WhoisEntry(object):
         'name_servers':     'Name Server:\s?(.+)', # list of name servers
         'status':           'Status:\s?(.+)', # list of statuses
         'emails':           '[\w.-]+@[\w.-]+\.[\w]{2,4}', # list of email addresses
+        'dnssec':           'dnssec:\s*([\S]+)',
     }
 
     def __init__(self, domain, text, regex=None):
@@ -153,6 +156,8 @@ class WhoisEntry(object):
             return WhoisKr(domain, text)
         elif domain.endswith('.pt'):
             return WhoisPt(domain, text)
+        elif domain.endswith('.bg'):
+            return WhoisBg(domain, text)
         else:
             return WhoisEntry(domain, text)
 
@@ -459,7 +464,7 @@ class WhoisFi(WhoisEntry):
         'expiration_date':                'expires:\s*([\S]+)',
         'name_servers':                   'nserver:\s*([\S]+) \[\S+\]',  # list of name servers
         'name_server_statuses':           'nserver:\s*([\S]+) \[(\S+)\]',  # list of name servers and statuses
-        'dnssec':                   'dnssec:\s*([\S]+)',
+        'dnssec':                         'dnssec:\s*([\S]+)',
 	}
     def __init__(self, domain, text):
         if 'Domain not ' in text:
@@ -594,6 +599,19 @@ class WhoisPt(WhoisEntry):
         'name_servers': '\tNS\t(.+).', # list of name servers
         'status': 'status:\s*(.+)', # list of statuses
         'emails': '[\w.-]+@[\w.-]+\.[\w]{2,4}', # list of email addresses
+    }
+
+    def __init__(self, domain, text):
+        if text.strip() == 'No entries found':
+            raise PywhoisError(text)
+        else:
+            WhoisEntry.__init__(self, domain, text, self.regex)
+
+class WhoisBg(WhoisEntry):
+    """Whois parser for .bg domains"""
+
+    regex = {
+        'expiration_date': 'expires at:\s*(.+)',
     }
 
     def __init__(self, domain, text):
